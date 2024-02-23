@@ -32,23 +32,24 @@ void loop() {
   if( Serial.available() > 0)
   {
     message = Serial.readStringUntil('\n');
-    Serial.println(message);
     LCD_Print_Msg(message);
+    Serial.println(message);
   }
 }
 
-void LCD_Print_Msg( String &str)
+void LCD_Print_Msg( String str)
 {
-  rmSpaceatColumn0(str);  // prepare the string suitable for 16 column LCD
+  String tempStr = str;
+  rmSpaceatColumn0(tempStr);  // prepare the string suitable for 16 column LCD
   lcd.clear();
-  uint8_t len = str.length() - 1;  // minus one to leave out the '\0' (we are not printing the null char)
+  uint8_t len = tempStr.length() - 1;  // minus one to leave out the '\0' (we are not printing the null char)
   uint8_t pos = 0;
   uint8_t overhead = 0;
-  while( pos < numCols && pos <= len)  // the first row
+  while( pos < numCols && pos < len)  // the first row
   {
     lcd.setCursor(0, 0);
     for( int i = 0; i <= pos; i++)
-      lcd.print( str[i]);
+      lcd.print( tempStr[i]);
     delay(interval);
     pos++;
   }
@@ -57,11 +58,11 @@ void LCD_Print_Msg( String &str)
     len -= numCols;
     overhead += numCols;
     pos = 0;
-    while( pos < numCols && pos <= len)  // do the second row
+    while( pos < numCols && pos < len)  // do the second row
     {
       lcd.setCursor( 0, 1);
       for( int i = 0; i <= pos; i++)
-        lcd.print( str[ i + overhead]);
+        lcd.print( tempStr[ i + overhead]);
       delay(interval);
       pos++;
     }
@@ -69,11 +70,11 @@ void LCD_Print_Msg( String &str)
     {
       lcd.clear();
       pos = 0;
-      while( pos < numCols && pos <= len)
+      while( pos < numCols && pos < len)
       {
         lcd.setCursor( 0, 0);  // shift the former second line
         for( int i = 0; i <= pos; i++)
-          lcd.print( str[ i + overhead]);
+          lcd.print( tempStr[ i + overhead]);
         pos++;
       }
     }
