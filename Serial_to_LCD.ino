@@ -46,21 +46,21 @@ void loop()
     LCD_ShiftTextOnLimit(message);
 
     // in scrolling up style
-    rmUnwantedSpace(message);
-    int len = message.length();
-    int shiftTime = ( ( message.length() + numCols -1 ) / numCols) - numRows;  // calculate how many shiftTime need to print all
-    int i = 0;
+    // rmUnwantedSpace(message);
+    // int len = message.length();
+    // int shiftTime = ( ( message.length() + numCols -1 ) / numCols) - numRows;  // calculate how many shiftTime need to print all
+    // int i = 0;
 /*
   shift till to see the last line of text/letter
   to make sure that the printing has ended,
   you can shift one more time to see the blank bottm row
 */
-    do
-    {
-      shiftUp( message, i, false);
-      delay(2000);
-      i++;
-    }while( i < shiftTime);
+    // do
+    // {
+    //   shiftUp( message, i, false);
+    //   delay(2000);
+    //   i++;
+    // }while( i < shiftTime);
 
     // uncomment the following 2 lines if willing to clear the LCD after 10 sec
     // delay(10000);
@@ -95,7 +95,7 @@ void LCD_ShiftTextOnLimit( String &str)
       delay(interval);  // put interval also before shifting
       shiftUp( tempStr, shiftTime, true);  // start shifting
       String substring = tempStr.substring(i * numCols, (i + 1) * numCols);
-      Serial.println(substring);
+      // Serial.println(substring);  // uncomment this line to see also on Serial Monitor
       printStringOnRow( substring, numRows-1, interval);
       shiftTime++;  // waiting for the next shifting
     }
