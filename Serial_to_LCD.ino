@@ -40,10 +40,31 @@ void loop()
   if( Serial.available() > 0)
   {
     message = Serial.readStringUntil('\n');
+    // Serial.println(message);  // in case want to see the message before further processing
+    
+    // in printing style
     LCD_ShiftTextOnLimit(message);
-    Serial.println(message);
-    delay(10000);
-    lcd.clear();
+
+    // in scrolling up style
+    rmUnwantedSpace(message);
+    int len = message.length();
+    int shiftTime = ( ( message.length() + numCols -1 ) / numCols) - numRows;  // calculate how many shiftTime need to print all
+    int i = 0;
+/*
+  shift till to see the last line of text/letter
+  to make sure that the printing has ended,
+  you can shift one more time to see the blank bottm row
+*/
+    do
+    {
+      shiftUp( message, i, false);
+      delay(2000);
+      i++;
+    }while( i < shiftTime);
+
+    // uncomment the following 2 lines if willing to clear the LCD after 10 sec
+    // delay(10000);
+    // lcd.clear();
   }
 }
 
@@ -111,22 +132,25 @@ void rmIndex(String &str, int index)
 void shiftUp(String &str, int shiftTime, bool leaveBotLine)
 {
   lcd.clear();
-  if( leaveBotLine == false)  // check if request to leave the bottom row for some printing performance
+  int printingRows = 0;
+  if( !leaveBotLine)  // check if request to leave the bottom row for some printing performance
+    printingRows = numRows;
+  else
+    printingRows = numRows-1;
+
+  for( int row = 0; row < printingRows; row++)  // for all rows
   {
-    for( int row = 0; row < numRows; row++)  // for all rows
+    lcd.setCursor( 0, row);  // change line
+
+    // this is another solution
+    // String substring = str.substring( ( row + shiftTime) * numCols, ( row + shiftTime + 1) * numCols);
+    // printStringOnRow( substring, row, 0);
+
+    for( int i = 0; i < numCols; i++)
     {
-      lcd.setCursor( 0, row);  // change line
-      for( int i = 0; i < numCols; i++)
-        lcd.print( str[ i + ( (row + shiftTime) * numCols)]);  // print depending on row and shift time on each column
-    }
-  }
-  else  // need to leave the bottom row (not getting printed by this function)
-  {
-    for( int row = 0; row < numRows-1; row++)  // just up to the row before the last
-    {
-      lcd.setCursor( 0, row);  // change line
-      for( int i = 0; i < numCols; i++)  
-        lcd.print( str[ i + ( (row + shiftTime) * numCols)]);  // print depending on row and shift time on each column
+      if( str[ i + ( (row + shiftTime) * numCols)] == '\0')
+        break;  // added because LCD  was printing the null characters too
+      lcd.print( str[ i + ( (row + shiftTime) * numCols)]);  // print depending on row and shift time on each column
     }
   }
 }
